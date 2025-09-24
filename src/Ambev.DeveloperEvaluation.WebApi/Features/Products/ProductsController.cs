@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
+using Ambev.DeveloperEvaluation.Application.Products.GetProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using AutoMapper;
 using MediatR;
@@ -42,7 +44,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var query = new GetProductRequest(id);
+            var query = new GetProductCommand(id);
             var result = await _mediator.Send(query);
 
             if (result == null)
@@ -58,7 +60,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             {
                 Success = true,
                 Message = "Product retrieved successfully",
-                Data = result
+                Data = _mapper.Map<ProductResponse>(result)
             });
         }
 
@@ -74,13 +76,13 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var query = new GetPaginatedProductsRequest(pageNumber, pageSize);
+            var query = new GetPaginatedProductsCommand(pageNumber, pageSize);
             var result = await _mediator.Send(query);
             return Ok(new ApiResponseWithData<PaginatedResponse<ProductResponse>>
             {
                 Success = true,
                 Message = "Paginated products retrieved successfully",
-                Data = result
+                Data = _mapper.Map<PaginatedResponse<ProductResponse>>(result)
             });
         }
 
