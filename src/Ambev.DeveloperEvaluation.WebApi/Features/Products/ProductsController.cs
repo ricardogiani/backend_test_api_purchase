@@ -71,7 +71,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         /// <param name="pageSize">The number of items per page.</param>
         /// <returns>A paginated list of products.</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponseWithData<PaginatedResponse<CreateProductResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseWithData<PaginatedResponse<ProductResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -83,7 +83,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
             resultData.Success = true;
             resultData.Message = "Paginated products retrieved successfully";
-            return Ok(resultData);            
+            return Ok(resultData);      // TODO alterar o tipo de retorno      
         }
 
         /// <summary>

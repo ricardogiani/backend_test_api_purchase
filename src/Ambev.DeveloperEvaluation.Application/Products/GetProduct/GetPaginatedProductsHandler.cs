@@ -16,9 +16,9 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
         private readonly IMapper _mapper;
 
         /// <summary>
-        /// Initializes a new instance of CreateUserHandler
+        /// Initializes a new instance of GetPaginatedProductsHandler
         /// </summary>
-        /// <param name="userRepository">The user repository</param>
+        /// <param name="productRepository">The product repository</param>
         /// <param name="mapper">The AutoMapper instance</param>
         /// <param name="validator">The validator for CreateUserCommand</param>
         public GetPaginatedProductsHandler(IProductRepository productRepository, IMapper mapper)
@@ -29,11 +29,9 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
 
         public async Task<GetPaginatedProductsResult> Handle(GetPaginatedProductsCommand request, CancellationToken cancellationToken)
         {
-            // TODO: validate
-
+            // TODO: validator
 
             (IEnumerable<Product> Products, int TotalCount) = await _productRepository.GetPaginatedAsync(request.pageNumber, request.pageSize, cancellationToken);
-
 
             var response = new GetPaginatedProductsResult()
             {
@@ -42,7 +40,6 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
                 TotalPages = (TotalCount / request.pageSize),
                 Products = _mapper.Map<IEnumerable<GetProductResult>>(Products)
             };
-
 
             return response;
         }
