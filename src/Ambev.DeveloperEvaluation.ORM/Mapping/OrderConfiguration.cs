@@ -17,6 +17,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.HasKey(o => o.Id);
             builder.Property(o => o.Id).HasColumnType("uuid").HasDefaultValueSql("gen_random_uuid()");
 
+            builder.Property(o => o.UserId).IsRequired();
             builder.Property(o => o.CustomerId).IsRequired();
             builder.Property(o => o.OrderDate).IsRequired();
             builder.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
@@ -25,6 +26,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
                    .WithOne(oi => oi.Order)
                    .HasForeignKey(oi => oi.OrderId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(oi => oi.User)
+                   .WithMany()
+                   .HasForeignKey(oi => oi.UserId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(oi => oi.Customer)
                    .WithMany()

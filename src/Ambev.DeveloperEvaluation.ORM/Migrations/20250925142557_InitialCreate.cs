@@ -90,7 +90,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     BranchId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,6 +106,12 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                         name: "FK_Orders_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -157,6 +164,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_UserId",
+                table: "Orders",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -164,9 +176,6 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
         {
             migrationBuilder.DropTable(
                 name: "OrderItems");
-
-            migrationBuilder.DropTable(
-                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -179,6 +188,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

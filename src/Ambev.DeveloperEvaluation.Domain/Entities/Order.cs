@@ -7,7 +7,7 @@ using Ambev.DeveloperEvaluation.Domain.Common;
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
     public class Order : BaseEntity
-    {        
+    {
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; }
 
@@ -19,7 +19,14 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public Branch Branch { get; set; }
 
         public string Status { get; set; }
-        
+
         public IEnumerable<OrderItem> OrderItems { get; set; }
+        
+        /// <summary>
+        /// User Id Operator
+        /// </summary>
+        /// <value></value>
+        public Guid UserId { get; set; }
+        public User User { get; set; }
     }
 }
