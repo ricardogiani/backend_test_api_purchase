@@ -8,8 +8,8 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
 {
     public class GetPaginatedProductsCommand  : IRequest<GetPaginatedProductsResult>
     {
-        private int pageNumber;
-        private int pageSize;
+        public int pageNumber;
+        public int pageSize;
 
         public GetPaginatedProductsCommand(int pageNumber, int pageSize)
         {

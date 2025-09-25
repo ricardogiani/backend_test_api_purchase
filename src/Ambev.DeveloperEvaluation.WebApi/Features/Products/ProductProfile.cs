@@ -21,10 +21,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             CreateMap<GetProductResult, ProductResponse>();
 
             CreateMap<CreateProductRequest, CreateProductCommand>();
-            CreateMap<CreateProductResult, ProductResponse>();
+            CreateMap<CreateProductResult, CreateProductResponse>();
 
             CreateMap<UpdateProductRequest, UpdateProductCommand>();
-            CreateMap<UpdateProductResult, ProductResponse>();
+            CreateMap<UpdateProductResult, CreateProductResponse>();
 
             CreateMap<GetPaginatedProductsResult, PaginatedResponse<ProductResponse>>()
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Products));

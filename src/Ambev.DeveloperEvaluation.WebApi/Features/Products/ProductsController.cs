@@ -39,7 +39,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         /// <param name="id">The unique identifier of the product.</param>
         /// <returns>The product details if found.</returns>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ApiResponseWithData<ProductResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateProductResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
@@ -56,11 +56,11 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
                 });
             }
 
-            return Ok(new ApiResponseWithData<ProductResponse>
+            return Ok(new ApiResponseWithData<CreateProductResponse>
             {
                 Success = true,
                 Message = "Product retrieved successfully",
-                Data = _mapper.Map<ProductResponse>(result)
+                Data = _mapper.Map<CreateProductResponse>(result)
             });
         }
 
@@ -70,20 +70,20 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of items per page.</param>
         /// <returns>A paginated list of products.</returns>
-        [HttpGet("paginated")]
-        [ProducesResponseType(typeof(ApiResponseWithData<PaginatedResponse<ProductResponse>>), StatusCodes.Status200OK)]
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResponseWithData<PaginatedResponse<CreateProductResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var query = new GetPaginatedProductsCommand(pageNumber, pageSize);
             var result = await _mediator.Send(query);
-            return Ok(new ApiResponseWithData<PaginatedResponse<ProductResponse>>
-            {
-                Success = true,
-                Message = "Paginated products retrieved successfully",
-                Data = _mapper.Map<PaginatedResponse<ProductResponse>>(result)
-            });
+
+            var resultData = _mapper.Map<PaginatedResponse<ProductResponse>>(result);
+
+            resultData.Success = true;
+            resultData.Message = "Paginated products retrieved successfully";
+            return Ok(resultData);            
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         /// <param name="request">The product creation command.</param>
         /// <returns>The created product.</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(ApiResponseWithData<ProductResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateProductResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
@@ -107,11 +107,11 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             var command = _mapper.Map<CreateProductCommand>(request);
 
             var result = await _mediator.Send(command);
-            return Created(string.Empty, new ApiResponseWithData<ProductResponse>
+            return Created(string.Empty, new ApiResponseWithData<CreateProductResponse>
             {
                 Success = true,
                 Message = "Product created successfully",
-                Data = _mapper.Map<ProductResponse>(result)
+                Data = _mapper.Map<CreateProductResponse>(result)
             });
         }
 
@@ -122,7 +122,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         /// <param name="request">The product update command.</param>
         /// <returns>No content if successful.</returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ApiResponseWithData<ProductResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateProductResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
@@ -146,11 +146,11 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
             var result = await _mediator.Send(command);
 
-            return Ok(new ApiResponseWithData<ProductResponse>
+            return Ok(new ApiResponseWithData<CreateProductResponse>
             {
                 Success = true,
                 Message = "Product updated successfully",
-                Data = _mapper.Map<ProductResponse>(result)
+                Data = _mapper.Map<CreateProductResponse>(result)
             });
         }
 

@@ -22,7 +22,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         /// <param name="product">Product to update</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if the user was deleted, false if not found</returns>
-        Task<Product?> UpdateAsync(Product product, CancellationToken cancellationToken = default);
+        Task<Product?> UpdateAsync(Product existProduct, Product productValues, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves a Product by their unique identifier
@@ -31,14 +31,23 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The user if found, null otherwise</returns>
         Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        
-       /// <summary>
+
+        /// <summary>
         /// Retrieves products based on a filter function
         /// </summary>
         /// <param name="filter">The filter function to apply</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>A collection of products that match the filter</returns>
         Task<IEnumerable<Product?>> GetByFilter(Func<Product, bool> filter, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///  Get paginated products
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns> <summary>
+        Task<(IEnumerable<Product> Products, int TotalCount)> GetPaginatedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
 
     }
