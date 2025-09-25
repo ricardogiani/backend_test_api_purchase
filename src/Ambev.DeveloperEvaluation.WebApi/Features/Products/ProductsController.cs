@@ -78,12 +78,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         {
             var query = new GetPaginatedProductsCommand(pageNumber, pageSize);
             var result = await _mediator.Send(query);
-
-            var resultData = _mapper.Map<PaginatedResponse<ProductResponse>>(result);
-
-            resultData.Success = true;
-            resultData.Message = "Paginated products retrieved successfully";
-            return Ok(resultData);      // TODO alterar o tipo de retorno      
+            var paginatedList = new PaginatedList<ProductResponse>(_mapper.Map<IEnumerable<ProductResponse>>(result.Products), result.TotalCount, result.CurrentPage, pageSize);
+            return OkPaginated(paginatedList);
         }
 
         /// <summary>

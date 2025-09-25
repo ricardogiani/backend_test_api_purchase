@@ -28,6 +28,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
             CreateMap<GetPaginatedProductsResult, PaginatedResponse<ProductResponse>>()
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Products));
+
             
         }
     }
