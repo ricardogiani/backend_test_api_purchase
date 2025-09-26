@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Application.Orders.CreateOrder;
 using Ambev.DeveloperEvaluation.Application.Orders.GetOrder;
+using Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Orders.CreateOrder;
 using Ambev.DeveloperEvaluation.WebApi.Features.Orders.GetOrder;
+using Ambev.DeveloperEvaluation.WebApi.Features.Orders.UpdateOrder;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -53,12 +55,39 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
             var command = _mapper.Map<CreateOrderCommand>(request);
 
             var result = await _mediator.Send(command);
+
+            // TODO BadRequest, validation, logs
             return Created(string.Empty, new ApiResponseWithData<CreateOrderResponse>
             {
                 Success = true,
                 Message = "Order created successfully",
                 Data = _mapper.Map<CreateOrderResponse>(result)
             });
+        }
+
+        /// <summary>
+        /// Add Order Items 
+        /// </summary>
+        /// <param name="request">The order creation request.</param>
+        /// <returns>The created order.</returns>
+        [HttpPost("{id}/items")]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateOrderResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddOrUpdateItems(Guid id, [FromBody] UpdateOrderRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Invalid request data"
+                });
+
+            var command = _mapper.Map<UpdateOrderCommand>(request);
+
+            var result = await _mediator.Send(command);
+            return Created(string.Empty, _mapper.Map<UpdateOrderResponse>(result));
+
         }
 
         /// <summary>
