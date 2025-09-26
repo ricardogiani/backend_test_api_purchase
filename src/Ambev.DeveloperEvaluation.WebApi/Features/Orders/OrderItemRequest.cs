@@ -11,9 +11,5 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
 
         public long Quantity { get; set; }
 
-        public long UnitPrice { get; set; }
-
-        public decimal Discount { get; set; }
-
     }
 }

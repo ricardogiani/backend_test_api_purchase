@@ -22,6 +22,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
 
             builder.Property(oi => oi.Quantity).IsRequired();
             builder.Property(oi => oi.UnitPrice).HasColumnType("decimal(18,2)").IsRequired();
+            builder.Property(oi => oi.Discount).HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(oi => oi.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
 
             builder.HasOne(oi => oi.Product)

@@ -17,10 +17,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             RuleFor(item => item.Quantity)
                 .GreaterThan(0)
                 .WithMessage("Quantity must be greater than 0.");
-
-            RuleFor(item => item.UnitPrice)
-                .GreaterThan(0)
-                .WithMessage("UnitPrice must be greater than 0.");            
+     
         }
     }
 }

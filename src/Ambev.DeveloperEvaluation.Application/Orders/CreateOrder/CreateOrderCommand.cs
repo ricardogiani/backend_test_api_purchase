@@ -12,8 +12,6 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 
         public DateTime OrderDate { get; set; }
 
-        public decimal TotalAmount { get; set; }
-
         public Guid BranchId { get; set; }
 
         public string Status { get; set; }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Application.Exceptions;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -13,7 +14,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 {
     public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrderResult>
     {
-        private readonly IOrderRepository _orderRepository;        
+        private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IBranchRepository _branchRepository;
@@ -53,12 +54,17 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
                 var validationResult = await validator.ValidateAsync(orderItemCmd, cancellationToken);
 
                 if (!validationResult.IsValid)
-                    throw new ValidationException(validationResult.Errors);
-
-                var product = await _productRepository.GetByIdAsync(orderItemCmd.ProductId);
-                if (product == null)
-                    throw new NotFoundException($"Product id {orderItemCmd.ProductId} not found", null);
+                    throw new ValidationException(validationResult.Errors);                
             }
+        }
+
+        public async Task<Product> GetProduct(Guid id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
+                throw new NotFoundException($"Product id {id} not found", null);
+
+            return product;
         }
 
         public async Task ValidateDataRelations(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -75,7 +81,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             if (branch == null)
                 throw new NotFoundException($"Branch id {request.CustomerId} not found", null);
         }
-                
+
 
         public async Task<CreateOrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
@@ -88,27 +94,32 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
                 if (!validationResult.IsValid)
                     throw new ValidationException(validationResult.Errors);
 
-                await ValidateDataRelations(request, cancellationToken);
                 await ValidateOrderItems(request.OrderItems, cancellationToken);
+
+                await ValidateDataRelations(request, cancellationToken);
 
                 Order newOrder = _mapper.Map<Order>(request);
 
                 foreach (var orderItemCmd in request.OrderItems)
-                {                    
+                {
                     OrderItem orderItem = _mapper.Map<OrderItem>(orderItemCmd);
 
+                    var product = await GetProduct(orderItem.ProductId);
+
+                    orderItem.UnitPrice = product.Price;
                     newOrder.AddItem(orderItem);
                 }
+
+                newOrder.Status = OrderStatus.Pending.ToString();
 
                 var orderResult = await _orderRepository.CreateAsync(newOrder, cancellationToken);
 
                 return _mapper.Map<CreateOrderResult>(orderResult);
             }
-            catch (System.Exception)
+            catch (DomainException ex)
             {
-
-                throw;
-            }
+                throw new ApplicationDomainException(ex.Message, ex);
+            }            
         }
     }
 }

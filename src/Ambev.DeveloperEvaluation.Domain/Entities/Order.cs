@@ -44,11 +44,25 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
 
 
-        public (bool Success, string Message) AddItem(OrderItem item)
-        {
-            _orderItems.Add(item);
 
-            TotalAmount = _orderItems.Sum(x => x.UnitPrice * x.Quantity);
+        public (bool Success, string Message) AddItem(OrderItem orderItem)
+        {
+            var itemExist = _orderItems.FirstOrDefault(x => x.ProductId == orderItem.ProductId);
+
+            if (itemExist != null)
+                itemExist.Quantity += orderItem.Quantity;
+            else
+            {
+                _orderItems.Add(orderItem);
+                itemExist = orderItem;
+            }
+
+            if (itemExist.Quantity > DomainSettings.MaxSameItemsToOrder)
+                    throw new DomainException($"It's not possible to sell above {DomainSettings.MaxSameItemsToOrder} identical items. id: {itemExist.Id}");           
+
+            itemExist.ApplyValues();
+
+            TotalAmount = _orderItems.Sum(x => x.TotalAmount);
 
             return (Success: true, Message: "Success");
         }

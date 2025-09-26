@@ -69,6 +69,11 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
                     Data = _mapper.Map<CreateOrderResponse>(result)
                 });
             }
+            catch (ApplicationDomainException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return BadRequest(ex.Message);
+            }            
             catch (NotFoundException ex)
             {
                 _logger.LogError(ex, ex.Message);
@@ -133,6 +138,61 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
                 }
 
                 return Ok(_mapper.Map<GetOrderResponse>(result));
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Partially updates an order.
+        /// </summary>
+        /// <param name="id">The unique identifier of the order.</param>
+        /// <param name="request">The partial update request.</param>
+        /// <returns>The updated order.</returns>
+        [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(ApiResponseWithData<UpdateOrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Patch(Guid id, [FromBody] UpdateOrderRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Invalid request data"
+                    });
+
+                var command = _mapper.Map<UpdateOrderCommand>(request);
+                command.Id = id;
+
+                var result = await _mediator.Send(command);
+
+                if (result == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Order not found"
+                    });
+                }
+
+                return Ok(new ApiResponseWithData<UpdateOrderResponse>
+                {
+                    Success = true,
+                    Message = "Order updated successfully",
+                    Data = _mapper.Map<UpdateOrderResponse>(result)
+                });
             }
             catch (NotFoundException ex)
             {

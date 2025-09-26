@@ -23,5 +23,19 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
         public decimal TotalAmount { get; set; }
 
+        public void ApplyValues()
+        {
+            if (Quantity > DomainSettings.Discount20_Percent.TotalItems)
+                Discount = UnitPrice * DomainSettings.Discount20_Percent.Discount;
+            else if (Quantity > DomainSettings.Discount10_Percent.TotalItems)
+                Discount = UnitPrice * DomainSettings.Discount10_Percent.Discount;
+            else
+                Discount = UnitPrice * DomainSettings.NothingDiscount;
+
+            TotalAmount = (UnitPrice - Discount) * Quantity;
+        }
+
     }
+
+
 }

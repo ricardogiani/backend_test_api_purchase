@@ -11,10 +11,5 @@ namespace Ambev.DeveloperEvaluation.Application.Orders
 
         public long Quantity { get; set; }
 
-        public long UnitPrice { get; set; }
-
-        public decimal Discount { get; set; }
-
-        public decimal TotalAmount { get; set; }
     }
 }
