@@ -110,7 +110,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
                     newOrder.AddItem(orderItem);
                 }
 
-                newOrder.Status = OrderStatus.Pending.ToString();
+                newOrder.Status = OrderStatus.Pending;
 
                 var orderResult = await _orderRepository.CreateAsync(newOrder, cancellationToken);
 

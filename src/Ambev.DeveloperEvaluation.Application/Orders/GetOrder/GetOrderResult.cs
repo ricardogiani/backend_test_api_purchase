@@ -8,6 +8,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
 {
     public class GetOrderResult
     {
+        public Guid Id { get; set; }
         public Guid CustomerId { get; set; }
         public GetCustomerResult Customer { get; set; }
 

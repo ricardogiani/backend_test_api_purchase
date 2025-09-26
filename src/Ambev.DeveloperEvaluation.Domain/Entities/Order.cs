@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Domain.Common;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
@@ -20,7 +21,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public Guid BranchId { get; set; }
         public Branch Branch { get; set; }
 
-        public string Status { get; set; }
+        public OrderStatus Status { get; set; }
 
         private readonly List<OrderItem> _orderItems = new();
 
@@ -58,7 +59,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
             }
 
             if (itemExist.Quantity > DomainSettings.MaxSameItemsToOrder)
-                    throw new DomainException($"It's not possible to sell above {DomainSettings.MaxSameItemsToOrder} identical items. id: {itemExist.Id}");           
+                    throw new DomainException($"It's not possible to sell above {DomainSettings.MaxSameItemsToOrder} identical items. productId: {itemExist.ProductId}");
 
             itemExist.ApplyValues();
 

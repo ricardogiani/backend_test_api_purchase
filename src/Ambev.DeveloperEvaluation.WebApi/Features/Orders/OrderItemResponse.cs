@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 
-namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
 {
-    public class OrderItemResult
+    public class OrderItemResponse
     {
         public Guid Id { get; set; }
         public Guid ProductId { get; set; }
@@ -13,5 +14,6 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
         public decimal UnitPrice { get; set; }
         public decimal Dicount { get; set; }
         public decimal TotalAmount { get; set; }
+
     }
 }

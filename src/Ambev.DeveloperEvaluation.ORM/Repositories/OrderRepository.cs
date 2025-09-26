@@ -29,11 +29,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
             return order;
         }
 
-        public async Task<Order?> UpdateAsync(Order existOrder, Order orderValues, CancellationToken cancellationToken = default)
+        public async Task<Order> UpdateAsync(Order order, CancellationToken cancellationToken = default)
         {
-            _context.Entry(existOrder).CurrentValues.SetValues(orderValues);
+            _context.Orders.Update(order);
             await _context.SaveChangesAsync(cancellationToken);
-            return orderValues;
+            return order;            
         }
 
         public async Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -50,7 +50,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
                 query = query.Include(include);
             }
 
-            var order = await query.FirstOrDefaultAsync(cancellationToken);
+            var order = await query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             return order;
         }
     }

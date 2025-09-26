@@ -124,7 +124,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
         {
             try
             {
-
                 var command = new GetOrderCommand(id);
                 var result = await _mediator.Send(command);
 

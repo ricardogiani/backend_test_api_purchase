@@ -23,7 +23,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         /// <param name="order">Order to update</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The updated order</returns>
-        Task<Order?> UpdateAsync(Order existOrder, Order orderValues, CancellationToken cancellationToken = default);
+        Task<Order> UpdateAsync(Order existOrder, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves an Order by its unique identifier

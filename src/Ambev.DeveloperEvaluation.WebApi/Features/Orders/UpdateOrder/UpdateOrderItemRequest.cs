@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders.UpdateOrder
 {
-    public class UpdateOrderRequest
+    public class UpdateOrderItemRequest
     {
-        public string Status { get; set; }
-        public DateTime? OrderDate { get; set; }
-        
+        public IEnumerable<OrderItemRequest> OrderItems { get; set; }
     }
 }

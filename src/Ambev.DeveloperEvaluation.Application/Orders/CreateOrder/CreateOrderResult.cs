@@ -9,6 +9,5 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
     {
         public Guid Id { get; set; }
 
-        public string Status { get; set; }
     }
 }

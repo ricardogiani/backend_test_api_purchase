@@ -7,6 +7,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder
 {
     public class UpdateOrderResult
     {
-        
+        public Guid Id { get; set; }
+
     }
 }
