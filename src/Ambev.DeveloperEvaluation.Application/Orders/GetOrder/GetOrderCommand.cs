@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
+namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
 {
-    public class GetProductCommand  : IRequest<GetProductResult>
+    public class GetOrderCommand : IRequest<GetOrderResult>
     {
         public Guid Id { get; set; }
 
-        public GetProductCommand(Guid id)
+        public GetOrderCommand(Guid id)
         {
             Id = id;
         }

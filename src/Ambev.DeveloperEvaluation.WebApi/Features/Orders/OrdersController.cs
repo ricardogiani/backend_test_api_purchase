@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Application.Orders.CreateOrder;
+using Ambev.DeveloperEvaluation.Application.Orders.GetOrder;
 using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.WebApi.Features.Orders.CreateOrder;
+using Ambev.DeveloperEvaluation.WebApi.Features.Orders.GetOrder;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +17,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
     [Route("api/[controller]")]
     public class OrdersController : BaseController
     {
-        
+
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
@@ -26,6 +30,70 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
         {
             _mediator = mediator;
             _mapper = mapper;
+        }
+
+        /// <summary>
+        /// Creates a new order.
+        /// </summary>
+        /// <param name="request">The order creation request.</param>
+        /// <returns>The created order.</returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateOrderResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Invalid request data"
+                });
+
+            var command = _mapper.Map<CreateOrderCommand>(request);
+
+            var result = await _mediator.Send(command);
+            return Created(string.Empty, new ApiResponseWithData<CreateOrderResponse>
+            {
+                Success = true,
+                Message = "Order created successfully",
+                Data = _mapper.Map<CreateOrderResponse>(result)
+            });
+        }
+
+        /// <summary>
+        /// Retrieves an order by its ID.
+        /// </summary>
+        /// <param name="id">The unique identifier of the order.</param>
+        /// <returns>The order details if found.</returns>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponseWithData<GetOrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            try
+            {
+
+                var command = new GetOrderCommand(id);
+                var result = await _mediator.Send(command);
+
+                if (result == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Order not found"
+                    });
+                }
+
+                return Ok(_mapper.Map<GetOrderResponse>(result));
+            }
+            catch (Exception ex)
+            {
+                // TODO NotFoundException, Logger, etc...
+                throw;
+            }
         }
     }
 }

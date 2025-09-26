@@ -13,7 +13,7 @@ public class DefaultContext : DbContext
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Branch> Branches { get; set; }
     public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
+    //public DbSet<OrderItem> OrderItems { get; set; }
 
     public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
     {

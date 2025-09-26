@@ -15,11 +15,11 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
         private readonly IMapper _mapper;
 
         /// <summary>
-        /// Initializes a new instance of CreateUserHandler
+        /// Initializes a new instance of CreateProductHandler
         /// </summary>
-        /// <param name="userRepository">The user repository</param>
+        /// <param name="productRepository">The Product repository</param>
         /// <param name="mapper">The AutoMapper instance</param>
-        /// <param name="validator">The validator for CreateUserCommand</param>
+        /// <param name="validator">The validator for CreateProductCommand</param>
         public CreateProductHandler(IProductRepository productRepository, IMapper mapper)
         {
             _productRepository = productRepository;

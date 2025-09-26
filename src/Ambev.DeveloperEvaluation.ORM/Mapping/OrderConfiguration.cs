@@ -22,15 +22,21 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(o => o.OrderDate).IsRequired();
             builder.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
 
+            //builder.Property(o => o.CreatedAt).HasColumnType("timestamptz").IsRequired();
+            //builder.Property(o => o.UpdatedAt).HasColumnType("timestamptz");
+            
             builder.HasMany(o => o.OrderItems)
                    .WithOne(oi => oi.Order)
                    .HasForeignKey(oi => oi.OrderId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Navigation(o => o.OrderItems)
+                    .UsePropertyAccessMode(PropertyAccessMode.Field);
+
             builder.HasOne(oi => oi.User)
-                   .WithMany()
-                   .HasForeignKey(oi => oi.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(oi => oi.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(oi => oi.Customer)
                    .WithMany()
