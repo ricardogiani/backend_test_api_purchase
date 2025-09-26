@@ -44,24 +44,34 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             _mapper = mapper;
         }
 
-        public async Task ValidateItem(OrderItemCommand itemCommand)
+        public async Task ValidateOrderItems(IEnumerable<OrderItemCommand> orderItemsCmd, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.GetByIdAsync(itemCommand.ProductId);
-            if (product == null)
-                throw new NotFoundException($"Product id {itemCommand.ProductId} not found", null);
+            var validator = new CreateOrderItemCommandValidator();
+
+            foreach (var orderItemCmd in orderItemsCmd)
+            {
+                var validationResult = await validator.ValidateAsync(orderItemCmd, cancellationToken);
+
+                if (!validationResult.IsValid)
+                    throw new ValidationException(validationResult.Errors);
+
+                var product = await _productRepository.GetByIdAsync(orderItemCmd.ProductId);
+                if (product == null)
+                    throw new NotFoundException($"Product id {orderItemCmd.ProductId} not found", null);
+            }
         }
 
-        public async Task ValidateDataRelations(CreateOrderCommand request)
+        public async Task ValidateDataRelations(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var customer = await _customerRepository.GetByIdAsync(request.CustomerId);
+            var customer = await _customerRepository.GetByIdAsync(request.CustomerId, cancellationToken);
             if (customer == null)
                 throw new NotFoundException($"Customer id {request.CustomerId} not found", null);
 
-            var user = _userRepository.GetByIdAsync(request.UserId);
+            var user = _userRepository.GetByIdAsync(request.UserId, cancellationToken);
             if (user == null)
                 throw new NotFoundException($"User id {request.CustomerId} not found", null);
 
-            var branch = _branchRepository.GetByIdAsync(request.UserId);
+            var branch = _branchRepository.GetByIdAsync(request.UserId, cancellationToken);
             if (branch == null)
                 throw new NotFoundException($"Branch id {request.CustomerId} not found", null);
         }
@@ -72,20 +82,19 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 
             try
             {
-
                 var validator = new CreateOrderCommandValidator();
                 var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!validationResult.IsValid)
                     throw new ValidationException(validationResult.Errors);
 
-                await ValidateDataRelations(request);
+                await ValidateDataRelations(request, cancellationToken);
+                await ValidateOrderItems(request.OrderItems, cancellationToken);
 
                 Order newOrder = _mapper.Map<Order>(request);
 
                 foreach (var orderItemCmd in request.OrderItems)
-                {
-                    await ValidateItem(orderItemCmd);
+                {                    
                     OrderItem orderItem = _mapper.Map<OrderItem>(orderItemCmd);
 
                     newOrder.AddItem(orderItem);
