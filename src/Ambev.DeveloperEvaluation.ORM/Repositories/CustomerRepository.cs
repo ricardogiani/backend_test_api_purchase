@@ -13,7 +13,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         private readonly DefaultContext _context;
 
         /// <summary>
-        /// Initializes a new instance of ProductRepository
+        /// Initializes a new instance of CustomerRepository
         /// </summary>
         /// <param name="context">The database context</param>
         public CustomerRepository(DefaultContext context)
@@ -25,6 +25,12 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         {
             await _context.Customers.AddAsync(customer, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+            return customer;
+        }
+
+        public async Task<Customer?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             return customer;
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Application.Exceptions;
 using Ambev.DeveloperEvaluation.Application.Orders.CreateOrder;
 using Ambev.DeveloperEvaluation.Application.Orders.GetOrder;
 using Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder;
@@ -22,16 +23,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
 
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
+        private readonly ILogger<OrdersController> _logger;
 
         /// <summary>
         /// Initializes a new instance of OrdersController
         /// </summary>
         /// <param name="mediator">The mediator instance</param>
         /// <param name="mapper">The AutoMapper instance</param>
-        public OrdersController(IMediator mediator, IMapper mapper)
+        public OrdersController(IMediator mediator, IMapper mapper, ILogger<OrdersController> logger)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _logger = logger;
         }
 
         /// <summary>
@@ -45,24 +48,37 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse
-                {
-                    Success = false,
-                    Message = "Invalid request data"
-                });
-
-            var command = _mapper.Map<CreateOrderCommand>(request);
-
-            var result = await _mediator.Send(command);
-
-            // TODO BadRequest, validation, logs
-            return Created(string.Empty, new ApiResponseWithData<CreateOrderResponse>
+            try
             {
-                Success = true,
-                Message = "Order created successfully",
-                Data = _mapper.Map<CreateOrderResponse>(result)
-            });
+                if (!ModelState.IsValid)
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Invalid request data"
+                    });
+
+                var command = _mapper.Map<CreateOrderCommand>(request);
+
+                var result = await _mediator.Send(command);
+
+                // TODO BadRequest, validation, logs
+                return Created(string.Empty, new ApiResponseWithData<CreateOrderResponse>
+                {
+                    Success = true,
+                    Message = "Order created successfully",
+                    Data = _mapper.Map<CreateOrderResponse>(result)
+                });
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         /// <summary>
@@ -118,9 +134,14 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
 
                 return Ok(_mapper.Map<GetOrderResponse>(result));
             }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(ex.Message);
+            }
             catch (Exception ex)
             {
-                // TODO NotFoundException, Logger, etc...
+                _logger.LogError(ex, ex.Message);
                 throw;
             }
         }
