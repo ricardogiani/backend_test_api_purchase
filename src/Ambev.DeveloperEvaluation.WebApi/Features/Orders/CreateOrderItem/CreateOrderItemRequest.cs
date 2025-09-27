@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders.UpdateOrder
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders.CreateOrderItem
 {
-    public class UpdateOrderItemRequest
+    public class CreateOrderItemRequest
     {
+        public Guid OrderId { get; set; }
+        
         public IEnumerable<OrderItemRequest> OrderItems { get; set; }
     }
 }

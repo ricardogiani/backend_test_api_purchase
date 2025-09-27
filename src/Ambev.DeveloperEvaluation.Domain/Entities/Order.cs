@@ -21,8 +21,9 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public Guid BranchId { get; set; }
         public Branch Branch { get; set; }
 
-        public OrderStatus Status { get; set; }
-
+        private OrderStatus _status;
+        public OrderStatus Status => _status;
+       
         private readonly List<OrderItem> _orderItems = new();
 
         public IReadOnlyCollection<OrderItem> OrderItems => _orderItems;
@@ -44,10 +45,19 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
+        public void ChangeStatus(OrderStatus newStatus)
+        {
+            if (Status == OrderStatus.Completed || Status == OrderStatus.Cancelled)
+                throw new DomainException($"Order id {Id} with status {Status} does not allow changes status");
 
+            _status = newStatus;
+        }
 
         public (bool Success, string Message) AddItem(OrderItem orderItem)
         {
+            if (!(Status == OrderStatus.Pending))
+                throw new DomainException($"Order id {Id} does not allow changes to items");
+
             var itemExist = _orderItems.FirstOrDefault(x => x.ProductId == orderItem.ProductId);
 
             if (itemExist != null)
@@ -59,7 +69,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
             }
 
             if (itemExist.Quantity > DomainSettings.MaxSameItemsToOrder)
-                    throw new DomainException($"It's not possible to sell above {DomainSettings.MaxSameItemsToOrder} identical items. productId: {itemExist.ProductId}");
+                throw new DomainException($"It's not possible to sell above {DomainSettings.MaxSameItemsToOrder} identical items. productId: {itemExist.ProductId}");
 
             itemExist.ApplyValues();
 
@@ -70,6 +80,9 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
         public bool RemoveItem(OrderItem item)
         {
+            if (!(Status == OrderStatus.Pending))
+                throw new DomainException($"Order id {Id} does not allow changes to items");
+
             var count = _orderItems.RemoveAll(x => x.ProductId == item.ProductId);
 
             TotalAmount = _orderItems.Sum(x => x.UnitPrice * x.Quantity);

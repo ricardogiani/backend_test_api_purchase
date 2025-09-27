@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Application.Branches;
 using Ambev.DeveloperEvaluation.Application.Customers.GetCustomer;
 
 namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
@@ -16,7 +17,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
 
         public decimal TotalAmount { get; set; }
 
-        public Guid BranchId { get; set; }        
+        public BranchResult Branch { get; set; }        
 
         public string Status { get; set; }
 

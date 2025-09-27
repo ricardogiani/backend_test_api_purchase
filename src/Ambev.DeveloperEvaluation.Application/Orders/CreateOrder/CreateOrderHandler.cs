@@ -9,6 +9,7 @@ using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 {
@@ -20,6 +21,9 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
         private readonly IBranchRepository _branchRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<CreateOrderHandler> _logger;
+
+        private readonly OrderSpecification orderSpecification = new OrderSpecification();
 
         /// <summary>
         /// Initializes a new instance of CreateOrderHandler
@@ -34,6 +38,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             ICustomerRepository customerRepository,
             IBranchRepository branchRepository,
             IUserRepository userRepository,
+            ILogger<CreateOrderHandler> logger,
             IMapper mapper)
         {
             _orderRepository = orderRepository;
@@ -42,21 +47,11 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             _branchRepository = branchRepository;
             _userRepository = userRepository;
 
+            _logger = logger;
+
             _mapper = mapper;
         }
 
-        public async Task ValidateOrderItems(IEnumerable<OrderItemCommand> orderItemsCmd, CancellationToken cancellationToken)
-        {
-            var validator = new CreateOrderItemCommandValidator();
-
-            foreach (var orderItemCmd in orderItemsCmd)
-            {
-                var validationResult = await validator.ValidateAsync(orderItemCmd, cancellationToken);
-
-                if (!validationResult.IsValid)
-                    throw new ValidationException(validationResult.Errors);                
-            }
-        }
 
         public async Task<Product> GetProduct(Guid id)
         {
@@ -88,29 +83,29 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 
             try
             {
+                _logger.LogInformation($"Receive request: {request}");
+
                 var validator = new CreateOrderCommandValidator();
                 var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!validationResult.IsValid)
                     throw new ValidationException(validationResult.Errors);
 
-                await ValidateOrderItems(request.OrderItems, cancellationToken);
-
+                await orderSpecification.ValidateOrderItems(request.OrderItems, cancellationToken);
                 await ValidateDataRelations(request, cancellationToken);
 
                 Order newOrder = _mapper.Map<Order>(request);
+                newOrder.ChangeStatus(OrderStatus.Pending);
 
-                foreach (var orderItemCmd in request.OrderItems)
+                var orderItems = _mapper.Map<IEnumerable<OrderItem>>(request.OrderItems);
+
+                foreach (var orderItem in orderItems)
                 {
-                    OrderItem orderItem = _mapper.Map<OrderItem>(orderItemCmd);
-
                     var product = await GetProduct(orderItem.ProductId);
 
                     orderItem.UnitPrice = product.Price;
                     newOrder.AddItem(orderItem);
                 }
-
-                newOrder.Status = OrderStatus.Pending;
 
                 var orderResult = await _orderRepository.CreateAsync(newOrder, cancellationToken);
 
@@ -118,6 +113,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             }
             catch (DomainException ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new ApplicationDomainException(ex.Message, ex);
             }            
         }

@@ -14,10 +14,14 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 
         public Guid BranchId { get; set; }
 
-        public string Status { get; set; }
-
         public IEnumerable<OrderItemCommand> OrderItems { get; set; }
 
         public Guid UserId { get; set; }
+
+        public override string ToString()
+        {
+            return $"CustomerId: {CustomerId}, OrderDate: {OrderDate}, BranchId: {BranchId}," +
+                $"UserId: {UserId}, ItemsCount: [{OrderItems.Count()}]";
+        }
     }
 }

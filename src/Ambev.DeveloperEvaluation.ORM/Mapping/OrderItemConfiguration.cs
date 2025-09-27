@@ -14,9 +14,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
         {
             builder.ToTable("OrderItems");
 
-            builder.HasKey(oi => oi.Id);
-            builder.Property(oi => oi.Id).HasColumnType("uuid").HasDefaultValueSql("gen_random_uuid()");
-
+            builder.HasKey(oi => new { oi.OrderId, oi.ProductId });   
+    
             builder.Property(oi => oi.OrderId).IsRequired();
             builder.Property(oi => oi.ProductId).IsRequired();
 

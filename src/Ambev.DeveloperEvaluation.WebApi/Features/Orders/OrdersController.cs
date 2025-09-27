@@ -4,10 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Application.Exceptions;
 using Ambev.DeveloperEvaluation.Application.Orders.CreateOrder;
+using Ambev.DeveloperEvaluation.Application.Orders.CreateOrderItem;
+using Ambev.DeveloperEvaluation.Application.Orders.DeleteOrderItem;
 using Ambev.DeveloperEvaluation.Application.Orders.GetOrder;
 using Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Orders.CreateOrder;
+using Ambev.DeveloperEvaluation.WebApi.Features.Orders.CreateOrderItem;
 using Ambev.DeveloperEvaluation.WebApi.Features.Orders.GetOrder;
 using Ambev.DeveloperEvaluation.WebApi.Features.Orders.UpdateOrder;
 using AutoMapper;
@@ -35,80 +38,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
             _mediator = mediator;
             _mapper = mapper;
             _logger = logger;
-        }
-
-        /// <summary>
-        /// Creates a new order.
-        /// </summary>
-        /// <param name="request">The order creation request.</param>
-        /// <returns>The created order.</returns>
-        [HttpPost]
-        [ProducesResponseType(typeof(ApiResponseWithData<CreateOrderResponse>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(new ApiResponse
-                    {
-                        Success = false,
-                        Message = "Invalid request data"
-                    });
-
-                var command = _mapper.Map<CreateOrderCommand>(request);
-
-                var result = await _mediator.Send(command);
-
-                // TODO BadRequest, validation, logs
-                return Created(string.Empty, new ApiResponseWithData<CreateOrderResponse>
-                {
-                    Success = true,
-                    Message = "Order created successfully",
-                    Data = _mapper.Map<CreateOrderResponse>(result)
-                });
-            }
-            catch (ApplicationDomainException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return BadRequest(ex.Message);
-            }            
-            catch (NotFoundException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Add Order Items 
-        /// </summary>
-        /// <param name="request">The order creation request.</param>
-        /// <returns>The created order.</returns>
-        [HttpPost("{id}/items")]
-        [ProducesResponseType(typeof(ApiResponseWithData<CreateOrderResponse>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddOrUpdateItems(Guid id, [FromBody] UpdateOrderRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse
-                {
-                    Success = false,
-                    Message = "Invalid request data"
-                });
-
-            var command = _mapper.Map<UpdateOrderCommand>(request);
-
-            var result = await _mediator.Send(command);
-            return Created(string.Empty, _mapper.Map<UpdateOrderResponse>(result));
-
         }
 
         /// <summary>
@@ -151,6 +80,55 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
         }
 
         /// <summary>
+        /// Creates a new order.
+        /// </summary>
+        /// <param name="request">The order creation request.</param>
+        /// <returns>The created order.</returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateOrderResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Invalid request data"
+                    });
+
+                var command = _mapper.Map<CreateOrderCommand>(request);
+
+                var result = await _mediator.Send(command);
+
+                // TODO BadRequest, validation, logs
+                return Created(string.Empty, new ApiResponseWithData<CreateOrderResponse>
+                {
+                    Success = true,
+                    Message = "Order created successfully",
+                    Data = _mapper.Map<CreateOrderResponse>(result)
+                });
+            }
+            catch (ApplicationDomainException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return BadRequest(ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+         /// <summary>
         /// Partially updates an order.
         /// </summary>
         /// <param name="id">The unique identifier of the order.</param>
@@ -161,7 +139,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Patch(Guid id, [FromBody] UpdateOrderRequest request)
+        public async Task<IActionResult> UpdatePartial(Guid id, [FromBody] UpdateOrderRequest request)
         {
             try
             {
@@ -204,5 +182,76 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Orders
                 throw;
             }
         }
+
+        /// <summary>
+        /// Add Order Items 
+        /// </summary>
+        /// <param name="request">The order creation request.</param>
+        /// <returns>The created order.</returns>
+        [HttpPost("{id}/items")]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateOrderResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddOrderItems(Guid id, [FromBody] CreateOrderItemRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Invalid request data"
+                    });
+
+                var command = _mapper.Map<CreateOrderItemCommand>(request);
+
+                var result = await _mediator.Send(command);
+                return Created(string.Empty, _mapper.Map<CreateOrderItemResponse>(result));    
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+        }
+
+        /// <summary>
+        /// Deletes an order item by its ID.
+        /// </summary>
+        /// <param name="id">The unique identifier of the order.</param>
+        /// <param name="idProduct">The unique identifier of the product.</param>
+        /// <returns>No content if the deletion is successful.</returns>
+        [HttpDelete("{id}/items/{idProduct}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteOrderItem(Guid id, Guid idProduct)
+        {
+            try
+            {
+                var command = new DeleteOrderItemCommand(id, idProduct);
+
+                await _mediator.Send(command);              
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }       
     }
 }

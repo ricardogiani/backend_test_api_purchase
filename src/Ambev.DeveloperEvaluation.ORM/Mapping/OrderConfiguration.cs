@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -48,10 +49,20 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
                    .HasForeignKey(oi => oi.BranchId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property(o => o.Status)
+            /*builder.Property<Status>("_status")
+              .HasColumnName("Status")
+              .IsRequired();*/
+
+              builder.Property<OrderStatus>("_status")
+                     .HasConversion<string>()
+                     .HasMaxLength(20)
+                     .HasColumnName("Status")
+                     .IsRequired();
+
+            /*builder.Property(o => o._status)
                    .HasConversion<string>()
                    .HasMaxLength(20)
-                   .IsRequired();
+                   .IsRequired();*/
         }
     }
 }

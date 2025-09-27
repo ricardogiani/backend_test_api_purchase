@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Application.Orders.CreateOrder;
+using Ambev.DeveloperEvaluation.Application.Orders.CreateOrderItem;
 using Ambev.DeveloperEvaluation.Application.Orders.GetOrder;
 using Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder;
 using Ambev.DeveloperEvaluation.Domain.Entities;
@@ -25,6 +26,9 @@ namespace Ambev.DeveloperEvaluation.Application.Orders
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
             CreateMap<OrderItem, OrderItemResult>();
+
+            CreateMap<Order, CreateOrderItemResult>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
             CreateMap<Order, UpdateOrderResult>();
 

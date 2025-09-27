@@ -7,6 +7,7 @@ using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder
 {
@@ -15,29 +16,47 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
+        private readonly ILogger<UpdateOrderHandler> _logger;
+
         /// <summary>
         /// Initializes a new instance of UpdateOrderHandler
         /// </summary>
         /// <param name="orderRepository">The Order repository</param>
         /// <param name="mapper">The AutoMapper instance</param>
-        public UpdateOrderHandler(IOrderRepository orderRepository, IMapper mapper)
+        public UpdateOrderHandler(IOrderRepository orderRepository, ILogger<UpdateOrderHandler> logger, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<UpdateOrderResult> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepository.GetByIdAsync(request.Id);
+            try
+            {
+                _logger.LogInformation($"Receive request: {request}");
 
-            if (order == null)
-                throw new NotFoundException($"Order id {request.Id} not Found", null);
-            
-            order.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), request.Status);
+                var order = await _orderRepository.GetByIdAsync(request.Id);
 
-            order = await _orderRepository.UpdateAsync(order, cancellationToken);
+                if (order == null)
+                    throw new NotFoundException($"Order id {request.Id} not Found", null);
 
-            return _mapper.Map<UpdateOrderResult>(order);
+                if (request.OrderDate.HasValue)
+                    order.OrderDate = request.OrderDate.Value;
+
+                if (!string.IsNullOrEmpty(request.Status))
+                    order.ChangeStatus((OrderStatus)Enum.Parse(typeof(OrderStatus), request.Status));
+
+                order = await _orderRepository.UpdateAsync(order, cancellationToken);
+
+                return _mapper.Map<UpdateOrderResult>(order);
+
+            }            
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                throw;
+            }
         }
     }
 }

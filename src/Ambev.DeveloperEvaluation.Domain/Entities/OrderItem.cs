@@ -6,14 +6,13 @@ using Ambev.DeveloperEvaluation.Domain.Common;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
-    public class OrderItem : BaseEntity
-    {
-        public Order Order { get; set; }
-        public Guid OrderId { get; set; }
-
-        public Product Product { get; set; }
-
+    public class OrderItem
+    {        
+        public Guid OrderId { get; set; }        
         public Guid ProductId { get; set; }
+
+        public Order Order { get; set; }
+        public Product Product { get; set; }
 
         public long Quantity { get; set; }
 
