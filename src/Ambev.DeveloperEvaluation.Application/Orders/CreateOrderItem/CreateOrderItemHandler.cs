@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Application.Exceptions;
 using Ambev.DeveloperEvaluation.Domain.Entities;
@@ -46,7 +47,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrderItem
             {
                 _logger.LogInformation($"Receive request: {request}");
 
-                var order = await _orderRepository.GetByIdAsync(request.OrderId);
+                var order = await _orderRepository.GetByIdWithIncludesAsync(request.OrderId, cancellationToken, x => x.OrderItems);
                 if (order == null)
                     throw new NotFoundException($"Order id {request.OrderId} not Found", null);
 

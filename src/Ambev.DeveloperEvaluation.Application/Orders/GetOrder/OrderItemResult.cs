@@ -11,7 +11,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
         public Guid ProductId { get; set; }
         public long Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public decimal Dicount { get; set; }
+        public decimal Discount { get; set; }
         public decimal TotalAmount { get; set; }
     }
 }

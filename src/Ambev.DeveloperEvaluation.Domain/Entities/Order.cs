@@ -85,7 +85,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
             var count = _orderItems.RemoveAll(x => x.ProductId == item.ProductId);
 
-            TotalAmount = _orderItems.Sum(x => x.UnitPrice * x.Quantity);
+            TotalAmount = _orderItems.Sum(x => x.TotalAmount);
 
             return (count > 0);
         }

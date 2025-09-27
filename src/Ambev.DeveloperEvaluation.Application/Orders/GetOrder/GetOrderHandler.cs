@@ -27,7 +27,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.GetOrder
 
         public async Task<GetOrderResult> Handle(GetOrderCommand request, CancellationToken cancellationToken)
         {
-            var result = await _orderRepository.GetByIdWithIncludesAsync(request.Id, cancellationToken, x => x.Branch, x => x.Customer, x => x.User);
+            var result = await _orderRepository.GetByIdWithIncludesAsync(request.Id, cancellationToken, x => x.OrderItems, x => x.Branch, x => x.Customer, x => x.User);
 
             return _mapper.Map<GetOrderResult>(result);
         }

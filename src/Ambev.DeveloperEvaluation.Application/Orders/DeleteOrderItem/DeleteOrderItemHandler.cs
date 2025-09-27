@@ -32,13 +32,13 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.DeleteOrderItem
 
             try
             {
-                var order = await _orderRepository.GetByIdAsync(request.OrderId);
+                var order = await _orderRepository.GetByIdWithIncludesAsync(request.OrderId, cancellationToken, x => x.OrderItems );
                 if (order == null)
                     throw new NotFoundException($"Order id {request.OrderId} not Found", null);
 
                 var orderItem = order.OrderItems.FirstOrDefault(i => i.ProductId == request.ProductId);
                 if (orderItem == null)
-                    throw new NotFoundException($"OrderItem id {request.ProductId} not Found", null);
+                    throw new NotFoundException($"Item for Product id {request.ProductId} not Found", null);
 
                 bool success = order.RemoveItem(orderItem);
 

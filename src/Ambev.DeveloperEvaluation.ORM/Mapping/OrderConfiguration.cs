@@ -23,9 +23,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(o => o.OrderDate).IsRequired();
             builder.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
 
-            //builder.Property(o => o.CreatedAt).HasColumnType("timestamptz").IsRequired();
-            //builder.Property(o => o.UpdatedAt).HasColumnType("timestamptz");
-            
+           
             builder.HasMany(o => o.OrderItems)
                    .WithOne(oi => oi.Order)
                    .HasForeignKey(oi => oi.OrderId)
@@ -49,20 +47,12 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
                    .HasForeignKey(oi => oi.BranchId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            /*builder.Property<Status>("_status")
-              .HasColumnName("Status")
-              .IsRequired();*/
-
               builder.Property<OrderStatus>("_status")
                      .HasConversion<string>()
                      .HasMaxLength(20)
                      .HasColumnName("Status")
                      .IsRequired();
 
-            /*builder.Property(o => o._status)
-                   .HasConversion<string>()
-                   .HasMaxLength(20)
-                   .IsRequired();*/
         }
     }
 }

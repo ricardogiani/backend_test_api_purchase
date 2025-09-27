@@ -17,10 +17,10 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.DeleteOrderItem
         /// </summary>
         /// <param name="orderId">The unique identifier of the order.</param>
         /// <param name="ProductId">The unique identifier of the order item.</param>
-        public DeleteOrderItemCommand(Guid orderId, Guid ProductId)
+        public DeleteOrderItemCommand(Guid orderId, Guid productId)
         {
             OrderId = orderId;
-            ProductId = ProductId;
+            ProductId = productId;
         }
 
         public override string ToString()
