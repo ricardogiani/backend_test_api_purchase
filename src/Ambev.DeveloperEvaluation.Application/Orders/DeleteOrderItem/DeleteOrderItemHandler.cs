@@ -46,7 +46,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.DeleteOrderItem
                 await _orderRepository.UpdateAsync(order);
 
                 // publish event
-                await _eventPublisherService.PublishAsync(_mapper.Map<PackageOrderEvent>(orderItem), EventPublisherType.ItemOrderCancelled);
+                await _eventPublisherService.PublishAsync(_mapper.Map<PackageOrderEvent>(orderItem), EventPublisherType.ItemOrderCanceled);
 
                 return new DeleteOrderItemResult { Success = success };
             }

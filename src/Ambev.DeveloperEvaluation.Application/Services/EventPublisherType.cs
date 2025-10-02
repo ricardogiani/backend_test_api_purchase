@@ -4,7 +4,7 @@ namespace Ambev.DeveloperEvaluation.Application.Events
     {
         OrderCreated = 0,
         OrderModified = 1,
-        OrderCancelled = 2,
-        ItemOrderCancelled =  3
+        OrderCanceled = 2,
+        ItemOrderCanceled =  3
     }
 }

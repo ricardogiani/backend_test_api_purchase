@@ -48,7 +48,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
         public void ChangeStatus(OrderStatus newStatus)
         {
-            if (Status == OrderStatus.Completed || Status == OrderStatus.Cancelled)
+            if (Status == OrderStatus.Completed || Status == OrderStatus.Canceled)
                 throw new DomainException($"Order id {Id} with status {Status} does not allow changes status");
 
             _status = newStatus;

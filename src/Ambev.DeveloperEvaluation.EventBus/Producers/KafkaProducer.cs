@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Domain.Producers;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.EventBus.Producers
 {
-    public class KafkaProducer<TValue> : IGenericProducer<TValue>
+    public class KafkaProducer<TValue> : IGenericEventProducer<TValue>
     {
         private readonly IProducer<Null, TValue> _producer;
         private readonly string _topic;

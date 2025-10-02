@@ -55,8 +55,8 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.UpdateOrder
 
                 // publish event
                 await _eventPublisherService.PublishAsync(_mapper.Map<PackageOrderEvent>(order),
-                    (order.Status == OrderStatus.Cancelled)
-                        ? EventPublisherType.OrderCancelled 
+                    (order.Status == OrderStatus.Canceled)
+                        ? EventPublisherType.OrderCanceled 
                         : EventPublisherType.OrderModified);
 
                 return _mapper.Map<UpdateOrderResult>(order);

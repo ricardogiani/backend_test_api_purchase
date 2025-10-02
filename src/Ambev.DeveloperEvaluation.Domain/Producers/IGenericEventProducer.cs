@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ambev.DeveloperEvaluation.EventBus.Producers
+namespace Ambev.DeveloperEvaluation.Domain.Producers
 {
-    public interface IGenericProducer<TValue>
+    public interface IGenericEventProducer<TValue>
     {
         Task ProduceAsync(TValue message);
     }
