@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Application.Events;
 using Ambev.DeveloperEvaluation.Application.Exceptions;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Enums;
@@ -10,6 +11,7 @@ using AutoMapper;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 {
@@ -22,6 +24,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateOrderHandler> _logger;
+        private readonly IEventPublisherService _eventPublisherService;
 
         private readonly OrderSpecification orderSpecification = new OrderSpecification();
 
@@ -39,17 +42,17 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             IBranchRepository branchRepository,
             IUserRepository userRepository,
             ILogger<CreateOrderHandler> logger,
-            IMapper mapper)
+            IMapper mapper,
+            IEventPublisherService eventPublisherService)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _customerRepository = customerRepository;
             _branchRepository = branchRepository;
             _userRepository = userRepository;
-
             _logger = logger;
-
             _mapper = mapper;
+            _eventPublisherService = eventPublisherService;
         }
 
 
@@ -109,6 +112,9 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
 
                 var orderResult = await _orderRepository.CreateAsync(newOrder, cancellationToken);
 
+                // publish event
+                await _eventPublisherService.PublishAsync(_mapper.Map<PackageOrderEvent>(newOrder), EventPublisherType.OrderCreated);
+
                 return _mapper.Map<CreateOrderResult>(orderResult);
             }
             catch (DomainException ex)
@@ -116,6 +122,11 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
                 _logger.LogError(ex.Message, ex);
                 throw new ApplicationDomainException(ex.Message, ex);
             }            
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                throw;
+            }
         }
     }
 }

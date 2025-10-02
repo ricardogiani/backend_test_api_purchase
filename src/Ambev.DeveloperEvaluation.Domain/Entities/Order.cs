@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Enums;
@@ -23,7 +24,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
         private OrderStatus _status;
         public OrderStatus Status => _status;
-       
+
         private readonly List<OrderItem> _orderItems = new();
 
         public IReadOnlyCollection<OrderItem> OrderItems => _orderItems;
@@ -89,5 +90,15 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
             return (count > 0);
         }
+
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, CustomerId: {CustomerId}, OrderDate: {OrderDate:yyyy-MM-dd HH:mm:ss}, " +
+                $"TotalAmount: {TotalAmount:F2}, Status: {Status}, BranchId: {BranchId}, " +
+                $"UserId: {UserId}, Items: {OrderItems.Count}, CreatedAt: {CreatedAt:yyyy-MM-dd HH:mm:ss}";
+        }
+        
+
     }
 }
