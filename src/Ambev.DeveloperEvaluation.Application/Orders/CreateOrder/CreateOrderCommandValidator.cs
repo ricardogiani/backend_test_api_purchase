@@ -10,7 +10,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
     {
         public CreateOrderCommandValidator()
         {            
-            RuleFor(order => order.OrderItems).Must(items => items.Any()).WithMessage("OrderItems must be greater than zero");
+            RuleFor(order => order.OrderItems).Must(items => items?.Any() == true).WithMessage("OrderItems must be greater than zero");
             RuleFor(order => order.CustomerId).NotEmpty();
             RuleFor(order => order.BranchId).NotEmpty();
             RuleFor(order => order.UserId).NotEmpty();

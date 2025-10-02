@@ -71,11 +71,11 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
             if (customer == null)
                 throw new NotFoundException($"Customer id {request.CustomerId} not found", null);
 
-            var user = _userRepository.GetByIdAsync(request.UserId, cancellationToken);
+            var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
             if (user == null)
                 throw new NotFoundException($"User id {request.CustomerId} not found", null);
 
-            var branch = _branchRepository.GetByIdAsync(request.UserId, cancellationToken);
+            var branch = await _branchRepository.GetByIdAsync(request.BranchId, cancellationToken);
             if (branch == null)
                 throw new NotFoundException($"Branch id {request.CustomerId} not found", null);
         }

@@ -21,7 +21,7 @@ namespace Ambev.DeveloperEvaluation.Application.Orders.CreateOrder
         public override string ToString()
         {
             return $"CustomerId: {CustomerId}, OrderDate: {OrderDate}, BranchId: {BranchId}," +
-                $"UserId: {UserId}, ItemsCount: [{OrderItems.Count()}]";
+                $"UserId: {UserId}, ItemsCount: [{OrderItems?.Count()}]";
         }
     }
 }
